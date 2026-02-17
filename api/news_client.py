@@ -15,7 +15,7 @@ def fetch_news(topics, language='es', country='mx'):
             'apikey': NEWS_APIKEY
         })
         query.raise_for_status()
-        #* Paser de json
+        #* Parser de json
         data = query.json()
         dataDict = {'status':data['status'],
                     'total_results':data['totalResults'],
