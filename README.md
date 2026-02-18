@@ -10,7 +10,7 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 
 - **Configuración de credenciales** (`config/settings.py`) — carga y valida variables de entorno desde `.env`
 - **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas, idioma y país (por defecto: español/México)
-- **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y función `create_User` para registrar usuarios
+- **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`
 - Módulos de procesamiento, resumen por IA, envío de correo y scheduler están preparados como scaffolding
 
 ## Requisitos
@@ -46,7 +46,7 @@ EMAIL_SENDER=tu_correo@ejemplo.com
 NewsDigest/
 ├── api/news_client.py        # Cliente para consumir NewsAPI
 ├── config/settings.py        # Carga de credenciales y configuración
-├── db/database.py            # Base de datos SQLite (init_db, create_User)
+├── db/database.py            # Base de datos SQLite (init_db, create_User, add_userTags, get_user_tags, get_all_users)
 ├── models/user.py            # (pendiente) Modelo de usuario
 ├── services/
 │   ├── mailer.py             # (pendiente) Envío de correos

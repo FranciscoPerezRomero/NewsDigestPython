@@ -1,4 +1,5 @@
-from db.database import create_User
+from db.database import get_all_users
 
-user_id = create_User("Carlos", "carlos@ejemplo.com")
-print(f"Usuario creado con ID: {user_id}")
+users = get_all_users()
+for user in users:
+    print(f"ID: {user[0]}, Nombre: {user[1]}, Email: {user[2]}")
