@@ -1,5 +1,7 @@
-from db.database import get_all_users
+from services.processor import title_processor
 
-users = get_all_users()
-for user in users:
-    print(f"ID: {user[0]}, Nombre: {user[1]}, Email: {user[2]}")
+result = title_processor(2)  # Usa el ID de un usuario que tengas
+print(f"Total de artículos únicos: {len(result)}")
+print("\nPrimeros 5 títulos únicos:")
+for i, article in enumerate(result[:5]):
+    print(f"{i+1}. {article['title']}")

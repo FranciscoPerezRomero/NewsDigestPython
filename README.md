@@ -11,7 +11,8 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Configuración de credenciales** (`config/settings.py`) — carga y valida variables de entorno desde `.env`
 - **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas, idioma y país (por defecto: español/México)
 - **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`
-- Módulos de procesamiento, resumen por IA, envío de correo y scheduler están preparados como scaffolding
+- **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos (`title_processor`, `titles_Similar`) usando índice de Jaccard con umbral del 50%
+- Módulos de resumen por IA, envío de correo y scheduler están preparados como scaffolding
 
 ## Requisitos
 
@@ -50,7 +51,7 @@ NewsDigest/
 ├── models/user.py            # (pendiente) Modelo de usuario
 ├── services/
 │   ├── mailer.py             # (pendiente) Envío de correos
-│   ├── processor.py          # (pendiente) Procesamiento de noticias
+│   ├── processor.py          # Procesamiento y deduplicación de noticias
 │   └── summarizer.py         # (pendiente) Resumen con IA
 ├── main.py                   # (pendiente) Punto de entrada
 └── scheduler.py              # (pendiente) Orquestador de tareas
