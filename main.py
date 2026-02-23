@@ -5,6 +5,7 @@ from services.processor import title_processor
 #* Obtenemos a todos los usuarios registrados
 usersInfo = get_all_users()
 userNews = []
+missingNews = 'Noticias no encontradas'
 print(usersInfo)
 #* Iteramos la lista de usuarios
 for user in usersInfo:
@@ -15,8 +16,17 @@ for user in usersInfo:
         for tag in tags:
             print(tag)
             fetchNews = title_processor(tag)
-            userNews.append(fetchNews[0])
+            if len(fetchNews) >= 1:
+                print(f'Tag: {tag}, Noticias encontradas: {len(fetchNews)}')
+                userNews.append(fetchNews[0])
+            else:
+                print(missingNews)
     else:
-        for i in range(0,4):
-            print(i)
-            # userNews = title_processor(tag)
+        fetchNews = title_processor(tags)
+        if len(fetchNews) >= 1:
+            print(f'Tag: {tags}, Noticias encontradas: {len(fetchNews)}')
+            userNews.extend(fetchNews[0:5])
+        else:
+            print(missingNews)
+    newsResume = generate_summaries(userNews)
+    print(newsResume[0]['summary'])

@@ -13,8 +13,8 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`, `delete_userByid`
 - **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos usando índice de Jaccard, ahora recibe tags individuales en lugar de user_id
 - **Resumen con IA** (`services/summarizer.py`) — genera resúmenes de 2-3 líneas por artículo usando Anthropic Claude con fallback a la descripción original
-- **Punto de entrada** (`main.py`) — (en desarrollo) orquesta el flujo: obtiene usuarios, sus tags, busca noticias y las procesa
-- Módulos de envío de correo y scheduler están preparados como scaffolding
+- **Punto de entrada** (`main.py`) — orquesta el flujo completo: obtiene usuarios, sus tags, busca noticias por tag, deduplica, genera resúmenes con IA. Pendiente: integración con mailer
+- Módulos de envío de correo (`mailer.py`) y scheduler están preparados como scaffolding
 
 ## Requisitos
 
@@ -55,6 +55,6 @@ NewsDigest/
 │   ├── mailer.py             # (pendiente) Envío de correos
 │   ├── processor.py          # Procesamiento y deduplicación de noticias por tag
 │   └── summarizer.py         # Resumen con IA via Anthropic Claude
-├── main.py                   # (en desarrollo) Flujo principal del digest
+├── main.py                   # Flujo principal del digest (pendiente: mailer)
 └── scheduler.py              # (pendiente) Orquestador de tareas
 ```
