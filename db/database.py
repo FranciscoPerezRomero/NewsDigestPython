@@ -67,3 +67,13 @@ def get_all_users():
         return None
     finally:
         conn.close()
+
+def delete_userByid():
+    conn = sqlite3.connect('newsdigest.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE id IN (?,?)",(1,2))
+    except sqlite3.IntegrityError:
+        return None
+    finally:
+        conn.close()

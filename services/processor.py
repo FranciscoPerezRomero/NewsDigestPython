@@ -1,10 +1,10 @@
 from api.news_client import fetch_news
 from db.database import get_user_tags
-def title_processor(user_id):
+def title_processor(tag):
     #* Diccionario para guardar los articulos
     unique_Articles = []
     #* Obtenemos articulos
-    dataDict = fetch_news(get_user_tags(user_id))
+    dataDict = fetch_news(tag)
     #* Ciclo para recorrer todos los articulos encontrados
     for article in dataDict['articles']:
         #* Cuando no hay articulos
@@ -19,7 +19,6 @@ def title_processor(user_id):
             if not duplicate_item:
                 unique_Articles.append(article)
     return unique_Articles
-    
 
 def titles_Similar(new_article, articleStorage):
     new_article = set(new_article.lower().split(" "))

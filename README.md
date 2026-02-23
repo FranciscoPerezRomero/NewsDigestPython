@@ -10,16 +10,17 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 
 - **Configuración de credenciales** (`config/settings.py`) — carga y valida variables de entorno desde `.env`
 - **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas, idioma y país (por defecto: español/México)
-- **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`
-- **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos (`title_processor`, `titles_Similar`) usando índice de Jaccard con umbral del 50%
-- **Resumen con IA** (`services/summarizer.py`) — (en desarrollo) estructura base para resumir noticias con Anthropic Claude
+- **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`, `delete_userByid`
+- **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos usando índice de Jaccard, ahora recibe tags individuales en lugar de user_id
+- **Resumen con IA** (`services/summarizer.py`) — genera resúmenes de 2-3 líneas por artículo usando Anthropic Claude con fallback a la descripción original
+- **Punto de entrada** (`main.py`) — (en desarrollo) orquesta el flujo: obtiene usuarios, sus tags, busca noticias y las procesa
 - Módulos de envío de correo y scheduler están preparados como scaffolding
 
 ## Requisitos
 
 - Python 3.11+
 - Cuenta en [NewsAPI.org](https://newsapi.org/)
-- Clave de API de Anthropic (pendiente de integración)
+- Clave de API de Anthropic
 
 ## Instalación
 
@@ -48,12 +49,12 @@ EMAIL_SENDER=tu_correo@ejemplo.com
 NewsDigest/
 ├── api/news_client.py        # Cliente para consumir NewsAPI
 ├── config/settings.py        # Carga de credenciales y configuración
-├── db/database.py            # Base de datos SQLite (init_db, create_User, add_userTags, get_user_tags, get_all_users)
+├── db/database.py            # Base de datos SQLite (init_db, create_User, add_userTags, get_user_tags, get_all_users, delete_userByid)
 ├── models/user.py            # (pendiente) Modelo de usuario
 ├── services/
 │   ├── mailer.py             # (pendiente) Envío de correos
-│   ├── processor.py          # Procesamiento y deduplicación de noticias
-│   └── summarizer.py         # (en desarrollo) Resumen con IA via Anthropic
-├── main.py                   # (pendiente) Punto de entrada
+│   ├── processor.py          # Procesamiento y deduplicación de noticias por tag
+│   └── summarizer.py         # Resumen con IA via Anthropic Claude
+├── main.py                   # (en desarrollo) Flujo principal del digest
 └── scheduler.py              # (pendiente) Orquestador de tareas
 ```
