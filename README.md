@@ -14,7 +14,8 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos usando índice de Jaccard, ahora recibe tags individuales en lugar de user_id
 - **Resumen con IA** (`services/summarizer.py`) — genera resúmenes de 2-3 líneas por artículo usando Anthropic Claude con fallback a la descripción original
 - **Punto de entrada** (`main.py`) — orquesta el flujo completo: obtiene usuarios, sus tags, busca noticias por tag, deduplica, genera resúmenes con IA. Pendiente: integración con mailer
-- Módulos de envío de correo (`mailer.py`) y scheduler están preparados como scaffolding
+- **Mailer** (`services/mailer.py`) — estructura inicial con `smtplib` y MIME para envío de correos HTML, pendiente implementación de funciones
+- Módulo scheduler preparado como scaffolding
 
 ## Requisitos
 
@@ -41,6 +42,7 @@ Crear un archivo `.env` en la raíz del proyecto:
 NEWS_APIKEY=tu_api_key_de_newsapi
 ANTHROPIC_APIKEY=tu_api_key_de_anthropic
 EMAIL_SENDER=tu_correo@ejemplo.com
+EMAIL_PASSWORD=tu_contraseña_de_app
 ```
 
 ## Estructura del proyecto
