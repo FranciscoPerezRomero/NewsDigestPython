@@ -11,11 +11,11 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Configuración de credenciales** (`config/settings.py`) — carga y valida variables de entorno desde `.env`
 - **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas, idioma y país (por defecto: español/México)
 - **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`, `delete_userByid`
-- **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos usando índice de Jaccard, ahora recibe tags individuales en lugar de user_id
+- **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos usando índice de Jaccard, recibe tags individuales en lugar de user_id
 - **Resumen con IA** (`services/summarizer.py`) — genera resúmenes de 2-3 líneas por artículo usando Anthropic Claude con fallback a la descripción original
-- **Punto de entrada** (`main.py`) — orquesta el flujo completo: obtiene usuarios, sus tags, busca noticias por tag, deduplica, genera resúmenes con IA. Pendiente: integración con mailer
-- **Mailer** (`services/mailer.py`) — estructura inicial con `smtplib` y MIME para envío de correos HTML, pendiente implementación de funciones
-- Módulo scheduler preparado como scaffolding
+- **Mailer** (`services/mailer.py`) — `send_email()` funcional: envío de correos HTML vía Gmail SMTP con autenticación por contraseña de app
+- **Punto de entrada** (`main.py`) — flujo completo encapsulado en `send_daily_digest()`: obtiene usuarios, tags, noticias, resúmenes con IA y envía email a cada usuario
+- **Scheduler** (`scheduler.py`) — orquestador con librería `schedule`, ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
 
 ## Requisitos
 
@@ -54,9 +54,9 @@ NewsDigest/
 ├── db/database.py            # Base de datos SQLite (init_db, create_User, add_userTags, get_user_tags, get_all_users, delete_userByid)
 ├── models/user.py            # (pendiente) Modelo de usuario
 ├── services/
-│   ├── mailer.py             # (pendiente) Envío de correos
+│   ├── mailer.py             # Envío de correos HTML vía Gmail SMTP
 │   ├── processor.py          # Procesamiento y deduplicación de noticias por tag
 │   └── summarizer.py         # Resumen con IA via Anthropic Claude
-├── main.py                   # Flujo principal del digest (pendiente: mailer)
-└── scheduler.py              # (pendiente) Orquestador de tareas
+├── main.py                   # send_daily_digest(): flujo completo del digest
+└── scheduler.py              # Orquestador: ejecuta digest diariamente a las 6:00 AM
 ```
