@@ -4,46 +4,50 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NewsDigest is a Python application that fetches news from NewsAPI based on user-defined topics, summarizes them using Anthropic's API, and delivers digests via email. It uses FastAPI for its web layer. The project is in early development — only the config loader and news API client are implemented; most service modules are scaffolded but empty.
+NewsDigest fetches news from NewsAPI based on per-user topics stored in SQLite, summarizes each article via Anthropic's API, and delivers HTML digests via Gmail SMTP. A `schedule`-based scheduler runs the daily digest automatically at 06:00.
 
 ## Commands
 
 ```bash
-# Activate virtual environment (Windows)
-./venv/Scripts/activate
+# Activate virtual environment (Linux)
+source venv/bin/activate
 
-# Install dependencies (note the typo in filename)
+# Install dependencies (note the intentional typo in filename)
 pip install -r requeriments.txt
 
-# Run the test script
-python test.py
+# Initialize the SQLite database (run once before first use)
+python -c "from db.database import init_db; init_db()"
 
-# Run tests with pytest
-pytest
+# Run a single digest immediately
+python -c "from main import send_daily_digest; send_daily_digest()"
+
+# Run the scheduler (loops forever, fires at 06:00 daily)
+python scheduler.py
+
+# Ad-hoc test for the summarizer
+python test_db.py
 ```
-
-No build step, linter, or CI pipeline is configured yet.
 
 ## Architecture
 
 ```
-config/settings.py      → Loads .env credentials (NEWS_APIKEY, ANTHROPIC_APIKEY, EMAIL_SENDER)
-api/news_client.py      → Fetches articles from NewsAPI.org (/v2/everything)
-services/processor.py   → (stub) News processing pipeline
-services/summarizer.py  → (stub) AI summarization via Anthropic
-services/mailer.py      → (stub) Email delivery
-db/database.py          → (stub) Data persistence
-models/user.py          → (stub) User model / subscriptions
-main.py                 → (stub) Application entry point, intended for FastAPI
-scheduler.py            → (stub) Periodic task orchestration
+config/settings.py    → Loads .env; raises ValueError if any credential is missing
+api/news_client.py    → GET /v2/everything with OR-joined topics; returns {status, total_results, fetched_at, articles}
+services/processor.py → Deduplicates articles per tag using Jaccard similarity (≥50% word overlap = duplicate)
+services/summarizer.py → Calls Anthropic claude-sonnet-4-20250514 (max_tokens=150); adds 'summary' key to each article dict
+services/mailer.py    → Gmail SMTP via smtplib; sends HTML email; EMAIL_PASSWORD must be a Gmail App Password
+db/database.py        → SQLite (newsdigest.db created in project root); tables: users, user_tags
+main.py               → send_daily_digest(): iterates all users → fetch by tag → deduplicate → summarize → email
+scheduler.py          → Wraps send_daily_digest() with schedule.every().day.at("6:00")
 ```
 
-**Data flow:** Config → NewsAPI fetch → Process → Summarize → Email
+**Data flow:** DB (users + tags) → NewsAPI fetch per tag → Jaccard dedup → Anthropic summarize → Gmail send
 
 ## Key Details
 
-- Python 3.11.3 with virtualenv at `venv/`
-- Environment variables loaded from `.env` via `python-dotenv`
-- `news_client.fetch_news(topics, language='es', country='mx')` defaults to Spanish/Mexico
-- Core dependencies: FastAPI, Requests, BeautifulSoup4, Pydantic, python-dotenv
-- The requirements file (`requeriments.txt`) contains many ML/CV libraries not currently used by the project
+- **`.env` variables required:** `NEWS_APIKEY`, `ANTHROPIC_APIKEY`, `EMAIL_SENDER`, `EMAIL_PASSWORD`
+- `newsdigest.db` is created in the **project root** (wherever the process is launched), not inside any subdirectory
+- `fetch_news(topics)` expects `topics` to be iterable (list/tuple); it joins them with ` OR `
+- The multi-tag path in `send_daily_digest` picks only the first article per tag (`fetchNews[0]`); the single-tag path takes up to 5 (`fetchNews[0:5]`)
+- `test_db.py` is actually a summarizer smoke test (misleading name) — it hits the live Anthropic API
+- The venv uses Python 3.14; the requirements file (`requeriments.txt`) contains legacy ML/CV libs not used by the project

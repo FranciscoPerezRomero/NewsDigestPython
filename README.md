@@ -4,34 +4,38 @@ Aplicación en Python para obtener, procesar y enviar resúmenes de noticias per
 
 ## Descripción
 
-NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar artículos por temas definidos por el usuario, los procesa con IA (Anthropic) para generar resúmenes y los distribuye vía email.
+NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar artículos por temas definidos por el usuario, los deduplica por similitud de títulos (Jaccard), genera resúmenes con IA (Anthropic Claude) y los distribuye vía Gmail SMTP.
 
 ## Estado actual
 
 - **Configuración de credenciales** (`config/settings.py`) — carga y valida variables de entorno desde `.env`
-- **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas, idioma y país (por defecto: español/México)
-- **Base de datos SQLite** (`db/database.py`) — inicialización de tablas (`users`, `user_tags`) y funciones CRUD: `create_User`, `add_userTags`, `get_user_tags`, `get_all_users`, `delete_userByid`
-- **Procesador de noticias** (`services/processor.py`) — deduplicación de artículos por similitud de títulos usando índice de Jaccard, recibe tags individuales en lugar de user_id
-- **Resumen con IA** (`services/summarizer.py`) — genera resúmenes de 2-3 líneas por artículo usando Anthropic Claude con fallback a la descripción original
-- **Mailer** (`services/mailer.py`) — `send_email()` funcional: envío de correos HTML vía Gmail SMTP con autenticación por contraseña de app
-- **Punto de entrada** (`main.py`) — flujo completo encapsulado en `send_daily_digest()`: obtiene usuarios, tags, noticias, resúmenes con IA y envía email a cada usuario
-- **Scheduler** (`scheduler.py`) — orquestador con librería `schedule`, ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
+- **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas con OR; por defecto español/México
+- **Base de datos SQLite** (`db/database.py`) — tablas `users` y `user_tags`; funciones CRUD completas
+- **Procesador de noticias** (`services/processor.py`) — deduplicación por similitud de títulos usando índice de Jaccard (≥50%)
+- **Resumen con IA** (`services/summarizer.py`) — resúmenes de 2-3 líneas por artículo con Anthropic Claude; fallback a descripción original
+- **Mailer** (`services/mailer.py`) — envío de correos HTML vía Gmail SMTP con contraseña de app
+- **Punto de entrada** (`main.py`) — `send_daily_digest()`: flujo completo por usuario (tags → noticias → resumen → email)
+- **Scheduler** (`scheduler.py`) — ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
 
 ## Requisitos
 
 - Python 3.11+
 - Cuenta en [NewsAPI.org](https://newsapi.org/)
-- Clave de API de Anthropic
+- Clave de API de Anthropic (con créditos activos)
+- Cuenta de Gmail con contraseña de app habilitada
 
 ## Instalación
 
 ```bash
 # Crear y activar entorno virtual
 python -m venv venv
-./venv/Scripts/activate  # Windows
+source venv/bin/activate  # Linux/macOS
 
 # Instalar dependencias
 pip install -r requeriments.txt
+
+# Inicializar la base de datos (solo la primera vez)
+python -c "from db.database import init_db; init_db()"
 ```
 
 ## Configuración
@@ -41,22 +45,34 @@ Crear un archivo `.env` en la raíz del proyecto:
 ```env
 NEWS_APIKEY=tu_api_key_de_newsapi
 ANTHROPIC_APIKEY=tu_api_key_de_anthropic
-EMAIL_SENDER=tu_correo@ejemplo.com
-EMAIL_PASSWORD=tu_contraseña_de_app
+EMAIL_SENDER=tu_correo@gmail.com
+EMAIL_PASSWORD=tu_contraseña_de_app_gmail
 ```
+
+## Uso
+
+```bash
+# Ejecutar el digest una sola vez
+python -m main
+
+# Ejecutar el scheduler (dispara automáticamente a las 6:00 AM)
+python scheduler.py
+```
+
+> **Nota:** Siempre ejecutar desde la raíz del proyecto usando `python -m <modulo>`. Correr archivos directamente (`python services/summarizer.py`) causa errores de importación.
 
 ## Estructura del proyecto
 
 ```
 NewsDigest/
 ├── api/news_client.py        # Cliente para consumir NewsAPI
-├── config/settings.py        # Carga de credenciales y configuración
-├── db/database.py            # Base de datos SQLite (init_db, create_User, add_userTags, get_user_tags, get_all_users, delete_userByid)
+├── config/settings.py        # Carga y validación de credenciales
+├── db/database.py            # Base de datos SQLite (users, user_tags)
 ├── models/user.py            # (pendiente) Modelo de usuario
 ├── services/
 │   ├── mailer.py             # Envío de correos HTML vía Gmail SMTP
-│   ├── processor.py          # Procesamiento y deduplicación de noticias por tag
-│   └── summarizer.py         # Resumen con IA via Anthropic Claude
+│   ├── processor.py          # Deduplicación de noticias por similitud Jaccard
+│   └── summarizer.py         # Resumen con IA vía Anthropic Claude
 ├── main.py                   # send_daily_digest(): flujo completo del digest
 └── scheduler.py              # Orquestador: ejecuta digest diariamente a las 6:00 AM
 ```
