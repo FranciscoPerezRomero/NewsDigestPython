@@ -16,7 +16,7 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Mailer** (`services/mailer.py`) — envío de correos HTML vía Gmail SMTP con contraseña de app
 - **Punto de entrada** (`main.py`) — `send_daily_digest()`: flujo completo por usuario (tags → noticias → resumen → email)
 - **Scheduler** (`scheduler.py`) — ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
-- **API REST con FastAPI** (`api.py`) — *(en desarrollo)* instancia de FastAPI con modelo `UserRegister` (Pydantic); endpoints pendientes de implementación
+- **API REST con FastAPI** (`rest_api.py`) — *(en desarrollo)* instancia de FastAPI con modelo `UserRegister` (Pydantic); endpoint `POST /register` funcional
 
 ## Requisitos
 
@@ -58,6 +58,9 @@ python -m main
 
 # Ejecutar el scheduler (dispara automáticamente a las 6:00 AM)
 python scheduler.py
+
+# Levantar la API REST (modo desarrollo)
+uvicorn rest_api:app --reload
 ```
 
 > **Nota:** Siempre ejecutar desde la raíz del proyecto usando `python -m <modulo>`. Correr archivos directamente (`python services/summarizer.py`) causa errores de importación.
@@ -74,7 +77,7 @@ NewsDigest/
 │   ├── mailer.py             # Envío de correos HTML vía Gmail SMTP
 │   ├── processor.py          # Deduplicación de noticias por similitud Jaccard
 │   └── summarizer.py         # Resumen con IA vía Anthropic Claude
-├── api.py                    # (en desarrollo) API REST con FastAPI
+├── rest_api.py               # (en desarrollo) API REST con FastAPI
 ├── main.py                   # send_daily_digest(): flujo completo del digest
 └── scheduler.py              # Orquestador: ejecuta digest diariamente a las 6:00 AM
 ```
