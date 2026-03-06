@@ -5,6 +5,7 @@ from config.settings import EMAIL_SENDER , EMAIL_PASSWORD
 
 def send_email(userName,userEmail,newsResume):
     try:
+        server = None
         msg = MIMEMultipart()
         msg['From'] = EMAIL_SENDER
         msg['To'] = userEmail
@@ -35,4 +36,5 @@ def send_email(userName,userEmail,newsResume):
     except Exception as e:
         return None
     finally:
-        server.quit()
+        if server is not None:
+            server.quit()

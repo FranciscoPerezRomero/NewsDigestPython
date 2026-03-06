@@ -13,7 +13,7 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Base de datos SQLite** (`db/database.py`) — tablas `users` y `user_tags`; funciones CRUD completas
 - **Procesador de noticias** (`services/processor.py`) — deduplicación por similitud de títulos usando índice de Jaccard (≥50%)
 - **Resumen con IA** (`services/summarizer.py`) — resúmenes de 2-3 líneas por artículo con Anthropic Claude; fallback a descripción original
-- **Mailer** (`services/mailer.py`) — envío de correos HTML vía Gmail SMTP con contraseña de app
+- **Mailer** (`services/mailer.py`) — envío de correos HTML vía Gmail SMTP con contraseña de app; cierre seguro de la conexión SMTP en el bloque `finally`
 - **Punto de entrada** (`main.py`) — `send_daily_digest()`: flujo completo por usuario (tags → noticias → resumen → email); retorna número de usuarios procesados
 - **Scheduler** (`scheduler.py`) — ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
 - **API REST con FastAPI** (`rest_api.py`) — instancia de FastAPI con CORS habilitado y documentación automática deshabilitada (`/docs` y `/redoc`); `POST /register` para registro de usuarios; `POST /send-digest` dispara el digest y retorna JSON con usuarios procesados
