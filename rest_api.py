@@ -5,7 +5,7 @@ from typing import List
 from db.database import create_User, add_userTags, get_user_tags, get_all_users, init_db
 from main import send_daily_digest
 #* Instancia de FastApi
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None)
 
 #*Configuracion de CORS|
 app.add_middleware(

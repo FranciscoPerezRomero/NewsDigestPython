@@ -16,7 +16,7 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Mailer** (`services/mailer.py`) — envío de correos HTML vía Gmail SMTP con contraseña de app
 - **Punto de entrada** (`main.py`) — `send_daily_digest()`: flujo completo por usuario (tags → noticias → resumen → email); retorna número de usuarios procesados
 - **Scheduler** (`scheduler.py`) — ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
-- **API REST con FastAPI** (`rest_api.py`) — instancia de FastAPI con CORS habilitado; `POST /register` para registro de usuarios; `GET /send-digest` dispara el digest y retorna JSON con usuarios procesados
+- **API REST con FastAPI** (`rest_api.py`) — instancia de FastAPI con CORS habilitado y documentación automática deshabilitada (`/docs` y `/redoc`); `POST /register` para registro de usuarios; `GET /send-digest` dispara el digest y retorna JSON con usuarios procesados
 
 ## Requisitos
 
