@@ -1,10 +1,21 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import List
 from db.database import create_User, add_userTags, get_user_tags, get_all_users, init_db
-
+from main import send_daily_digest
 #* Instancia de FastApi
 app = FastAPI()
+
+#*Configuracion de CORS|
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # En producción, especifica solo los dominios permitidos
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 #* Se inicia la base de datos
 init_db()
 #* Modelo para validación automatica
@@ -30,3 +41,7 @@ def register_user(user:UserRegister):
     else:
         raise HTTPException(status_code=400, detail="Cantidad de tags invalido")
     pass
+
+@app.get("/send-digest")
+def send_digest():
+    send_daily_digest()
