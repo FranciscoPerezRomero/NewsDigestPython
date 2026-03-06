@@ -42,7 +42,7 @@ def register_user(user:UserRegister):
         raise HTTPException(status_code=400, detail="Cantidad de tags invalido")
     pass
 
-@app.get("/send-digest")
+@app.post("/send-digest")
 def send_digest():
     count = send_daily_digest()
     return {"message":"Process Success -> ", "users_processed":{count}}
