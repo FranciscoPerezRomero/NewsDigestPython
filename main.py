@@ -13,20 +13,20 @@ def send_daily_digest():
     for user in usersInfo:
         userId, userName, userEmail = user
         tags = get_user_tags(userId)
-        
+        print(user)
         if len(tags) > 1:
             for tag in tags:
                 print(tag)
                 fetchNews = title_processor(tag)
                 if len(fetchNews) >= 1:
-                    #* print(f'Tag: {tag}, Noticias encontradas: {len(fetchNews)}')
+                    print(f'Tag: {tag}, Noticias encontradas: {len(fetchNews)}')
                     userNews.append(fetchNews[0])
                 else:
                     print(missingNews)
         else:
             fetchNews = title_processor(tags)
             if len(fetchNews) >= 1:
-                #* print(f'Tag: {tags}, Noticias encontradas: {len(fetchNews)}')
+                print(f'Tag: {tags}, Noticias encontradas: {len(fetchNews)}')
                 userNews.extend(fetchNews[0:5])
             else:
                 print(missingNews)
@@ -34,7 +34,7 @@ def send_daily_digest():
         newsResume = generate_summaries(userNews)
         send_email(userName, userEmail, newsResume)
         userNews = []  # Resetear para siguiente usuario
-    print(f'Users Processed: {users_processed}')
-    
+    return users_processed
+
 if __name__ == "__main__":
     send_daily_digest()

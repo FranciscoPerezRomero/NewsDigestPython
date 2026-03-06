@@ -44,4 +44,5 @@ def register_user(user:UserRegister):
 
 @app.get("/send-digest")
 def send_digest():
-    send_daily_digest()
+    count = send_daily_digest()
+    return {"message":"Process Success -> ", "users_processed":{count}}

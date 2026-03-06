@@ -6,7 +6,7 @@ Aplicación en Python para obtener, procesar y enviar resúmenes de noticias per
 
 NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar artículos por temas definidos por el usuario, los deduplica por similitud de títulos (Jaccard), genera resúmenes con IA (Anthropic Claude) y los distribuye vía Gmail SMTP.
 
-## Estado actual
+## Estado actual — versión estable ✓
 
 - **Configuración de credenciales** (`config/settings.py`) — carga y valida variables de entorno desde `.env`
 - **Cliente de NewsAPI** (`api/news_client.py`) — consulta artículos por temas con OR; por defecto español/México
@@ -14,9 +14,9 @@ NewsDigest consume la API de [NewsAPI.org](https://newsapi.org/) para buscar art
 - **Procesador de noticias** (`services/processor.py`) — deduplicación por similitud de títulos usando índice de Jaccard (≥50%)
 - **Resumen con IA** (`services/summarizer.py`) — resúmenes de 2-3 líneas por artículo con Anthropic Claude; fallback a descripción original
 - **Mailer** (`services/mailer.py`) — envío de correos HTML vía Gmail SMTP con contraseña de app
-- **Punto de entrada** (`main.py`) — `send_daily_digest()`: flujo completo por usuario (tags → noticias → resumen → email)
+- **Punto de entrada** (`main.py`) — `send_daily_digest()`: flujo completo por usuario (tags → noticias → resumen → email); retorna número de usuarios procesados
 - **Scheduler** (`scheduler.py`) — ejecuta `send_daily_digest()` automáticamente todos los días a las 6:00 AM
-- **API REST con FastAPI** (`rest_api.py`) — *(en desarrollo)* instancia de FastAPI con modelo `UserRegister` (Pydantic); endpoints `POST /register` y `GET /send-digest` funcionales; CORS habilitado
+- **API REST con FastAPI** (`rest_api.py`) — instancia de FastAPI con CORS habilitado; `POST /register` para registro de usuarios; `GET /send-digest` dispara el digest y retorna JSON con usuarios procesados
 
 ## Requisitos
 
