@@ -3,13 +3,16 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from config.settings import EMAIL_SENDER , EMAIL_PASSWORD
 
-def send_email(userName,userEmail,newsResume):
+def send_email(userName, userEmail, newsResume):
+    server = None
     try:
-        server = None
+        print(f"[DEBUG] Iniciando envío para {userEmail}")
         msg = MIMEMultipart()
         msg['From'] = EMAIL_SENDER
         msg['To'] = userEmail
-        msg['Subject'] = 'asunto'
+        msg['Subject'] = 'Tus noticias del día'
+        
+        print(f"[DEBUG] Construyendo HTML para {len(newsResume)} noticias")
         noticias_html = ""
         for article in newsResume:
             noticias_html += f"""
@@ -19,6 +22,7 @@ def send_email(userName,userEmail,newsResume):
                     <a href="{article['url']}">Leer más</a>
                 </div>
             """
+        
         body = f"""
         <html>
         <body>
@@ -28,12 +32,24 @@ def send_email(userName,userEmail,newsResume):
         </body>
         </html>
         """
-        msg.attach(MIMEText(body,'html'))
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        
+        print("[DEBUG] Adjuntando body al mensaje")
+        msg.attach(MIMEText(body, 'html'))
+        
+        print("[DEBUG] Conectando a Gmail SMTP...")
+        server = smtplib.SMTP('smtp.gmail.com', 465)
         server.starttls()
-        server.login(EMAIL_SENDER,EMAIL_PASSWORD)
+        
+        print("[DEBUG] Haciendo login...")
+        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
+        
+        print("[DEBUG] Enviando mensaje...")
         server.send_message(msg)
+        
+        print(f"[DEBUG] Email enviado exitosamente a {userEmail}")
+
     except Exception as e:
+        print(f"[ERROR] Falló send_email: {type(e).__name__}: {str(e)}")
         return None
     finally:
         if server is not None:

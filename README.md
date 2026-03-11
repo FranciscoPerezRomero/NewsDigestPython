@@ -81,3 +81,16 @@ NewsDigest/
 ├── main.py                   # send_daily_digest(): flujo completo del digest
 └── scheduler.py              # Orquestador: ejecuta digest diariamente a las 6:00 AM
 ```
+
+## Pendiente — Despliegue en servidor propio
+
+> **TODO:** Montar el bot en un ordenador viejo disponible como servidor local.
+>
+> Tareas por hacer cuando se disponga del hardware:
+> - Instalar SO ligero (Debian/Ubuntu Server o similar)
+> - Configurar acceso SSH y red local/dominio dinámico si se requiere acceso remoto
+> - Clonar el repositorio y configurar el `.env` en el servidor
+> - Ejecutar `scheduler.py` como servicio del sistema (p. ej. con `systemd`)
+> - Opcional: exponer la API REST con nginx como proxy inverso
+>
+> Esta fase del proyecto queda **pendiente** hasta tener el servidor disponible y configurado.
